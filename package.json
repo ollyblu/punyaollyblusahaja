@@ -1,6 +1,6 @@
 {
     "name": "shadowsage-bot",
-    "version": "1.0",
+    "version": "1.0.0",
     "description": "ShadowSage-BOT By Alexander",
     "deprecated": false,
     "main": "index.js",
@@ -22,6 +22,17 @@
         "js-whatsapp",
         "whatsapp"
     ],
+    "homepage": "https://github.com/ollyblu/shadowsage.git",
+    "author": {
+        "name": "ollyblu"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/ollyblu/shadowsage.git"
+    },
+    "bugs": {
+        "url": "https://github.com/ollyblu/shadowsage/issues"
+    },
     "dependencies": {
         "cfonts": "^3.2.0",
         "chalk": "^4.1.2",
