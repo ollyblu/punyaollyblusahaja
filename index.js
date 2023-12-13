@@ -7,6 +7,7 @@ const yargs = require('yargs/yargs')
 const Readline = require('readline')
 const chalk = require('chalk')
 const rl = Readline.createInterface(process.stdin,process.stdout)
+global.terminal = {}
 Cfonts.say('Starting...',{
   colors: ['#ff0000'],
   font:'console',
@@ -23,6 +24,7 @@ Cfonts.say(`${package.author} dan ${package.name} dan ${package.main}`,{
     align:'center',
 })
 var isRunning = false
+//require('./app/main.js')
 function start(file){
     if(isRunning)return
     isRunning = true
@@ -39,6 +41,7 @@ function start(file){
     let p = cluster.fork()
     p.on('message', data => {
         console.log('[RECEIVED]', data)
+        terminal.message = data
         switch (data) {
           case 'reset':
             p.kill()
@@ -48,6 +51,11 @@ function start(file){
           case 'uptime':
             p.send(process.uptime())
             break
+          case 'break':
+            terminal.break = true
+            console.log('short break')
+            break
+
         }
     })
     p.on('exit', code => {
