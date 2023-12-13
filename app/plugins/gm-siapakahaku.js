@@ -3,8 +3,8 @@ const fetch = require('node-fetch')
 const timeout = 120000
 const poin = 500
 handler = {}
-handler.main = async (pesan) => {
-    let id = server.room_id
+handler.main = async (dt,pesan) => {
+    let id = dt.room_id
     if (typeof server.room[id].child !== 'undefined') {
         if (server.room[id].child == 'siapakahaku') {
             pesan.reply(`Masih ada soal yang belum terjawab di chat ini`)
@@ -38,7 +38,7 @@ Bonus: ${poin} XP
     ]
 }
 handler.help = 'siapakahaku'
-handler.room = 'game'
+handler.tags = ['game']
 handler.command = /^siapa(kah)?aku/i
 
 module.exports = handler

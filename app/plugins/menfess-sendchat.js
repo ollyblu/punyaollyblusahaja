@@ -1,7 +1,5 @@
 handler ={}
-handler.main = async(pesan)=>{
-    let message = 'pesan'
-    message = pesan.body
-    
+handler.main = async(dt,pesan)=>{
+
 }
-handler.command = /(send|sendto|kirim|kirimke)/
+handler.command = /menfess/

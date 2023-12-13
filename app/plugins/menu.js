@@ -1,4 +1,6 @@
 let moment = require('moment-timezone')
+const util = require('util')
+const similarity = require('similarity')
 moment.locale('id')
 const defaultMenu ={
     before:`
@@ -22,11 +24,31 @@ ${'```%npmdesc```'}
 `
 }
 handler ={}
-handler.main = async(pesan)=>{
+handler.main = async(dt,pesan)=>{
+  let sender = dt.sender
     try{
     let tags
     tags = {
+        'top':'Top Fitur',
         'game':'Game',
+        'internet':'Internet',
+        'info':'Informasi',
+        'quotes':'Quotes',
+        'translate':'Translate',
+        'tools':'Alat',
+        'buku':'Bacaan',
+        'kerang':'Kerang Ajaib'
+    }
+    if(dt.args.length>1){
+      let tag = Object.keys(tags).find(prdc=> similarity(prdc,dt.args[1])>0.5||similarity(tags[prdc],dt.args[1])>0.5)
+      //if(tag)tags = Object.values(tags)[tag]
+      let ntags = {}
+      for(key in tags)
+        if(key == tag)
+          ntags[key] = tags[key]
+      tags = ntags
+      //if(tag)tags = tags[tag]
+      console.log('filteres',tags)
     }
     let d = new Date(new Date + 3600000)
     let locale = 'id'
@@ -62,7 +84,7 @@ handler.main = async(pesan)=>{
     let help = Object.values(global.plugins).filter(plugin => !plugin.disabled).filter(plugin => !plugin.child).map(plugin => {
         return {
           help: Array.isArray(plugin.help) ? plugin.help : [plugin.help],
-          tags: Array.isArray(plugin.room) ? plugin.room : [plugin.room],
+          tags: Array.isArray(plugin.room) ? plugin.room : Array.isArray(plugin.tags)?plugin.tags : plugin.room,
           prefix: 'customPrefix' in plugin,
           limit: plugin.limit,
           premium: plugin.premium,
@@ -103,7 +125,7 @@ handler.main = async(pesan)=>{
         ucapan: ucapan(),
         me: bot.name,
         uptime: muptime,
-        name: `@${server.sender.split('@')[0]}`,
+        name: `@${sender.split('@')[0]}`,
         totalreg,week,weton,date,time,WIB,
         npmname: 'Version',
         version: '2.1.0',
@@ -115,22 +137,30 @@ handler.main = async(pesan)=>{
     text = text.replace(new RegExp(`%(${Object.keys(replace).sort((a, b) => b.length - a.length).join`|`})`, 'g'), (_, name) => '' + replace[name])
     let contact = {
         id:{
-            _serialized: `${server.sender}`
+            _serialized: `${sender}`
         }
     }
     //console.log(text)
-    await server.client.sendMessage(pesan.from,text,{mentions:[contact]})
+    try{
+      if(0&&extension&&extension.ads){
+        media = await server.MessageMedia.fromFilePath(extension.ads.your_ads_here.dir)
+          await server.client.sendMessage(pesan.from,media,{caption:text,mentions:[contact]})
+        delete media
+      }else{
+        await server.client.sendMessage(pesan.from,text,{mentions:[contact]})
+      }
+    }catch(err){console.error(err)}
     }catch(e){
-        let text= `Maaf @${server.sender.split('@')[0]}, menu sedang error`
+        let text= `Maaf @${sender.split('@')[0]}, menu sedang error`
         let contact = {
             id:{
-                _serialized: `${server.sender}`
+                _serialized: `${sender}`
             }
         }
         let obj ={}
         
         await server.client.sendMessage(pesan.from,text,{mentions:[contact]})
-        await server.client.sendMessage(pesan.from,e.toString())
+        await server.client.sendMessage(pesan.from,e.name+e.message)
     }
 }
 function clockString(ms) {

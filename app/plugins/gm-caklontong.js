@@ -4,10 +4,10 @@ let timeout = 120000
 let poin = 500
 handler ={}
 handler.help = 'caklontong'
-handler.room = 'game'
+handler.tags = ['game']
 handler.command = /caklontong|cak|lontong/i
-handler.main = async (pesan) => {
-    let id = server.room_id
+handler.main = async (dt,pesan) => {
+    let id = dt.room_id
     if(typeof server.room[id].child !== 'undefined'){
         if(server.room[id].child == 'caklontong'){
             pesan.reply(`Masih ada soal yang belum terjawab\n${server.room[id].caklontong[1].soal}`)
@@ -19,7 +19,7 @@ handler.main = async (pesan) => {
     let resource = JSON.parse(fs.readFileSync('./app/library/caklontong.json'))
     let random = Math.floor(Math.random() * resource.length)
     let json = resource[random]
-    let caption = `*${json.soal}*\nWaktu: ${timeout/1000}detik\nKetik *!clue* untuk bantuan
+    let caption = `*${json.soal}*\nWaktu: ${timeout/1000}detik\nBonus: ${poin}\nKetik *!clue* untuk bantuan
 `.trim()
     server.room[id].name = 'game'
     server.room[id].child = 'caklontong'
@@ -32,7 +32,7 @@ handler.main = async (pesan) => {
             delete server.room[id].child
             //reloadRoom(id)
         },timeout),
-        Date.now()
+        poin
     ]
 }
 module.exports = handler

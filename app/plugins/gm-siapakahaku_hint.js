@@ -1,12 +1,13 @@
 handler = {}
-handler.main = async (pesan) => {
-    let id = server.room_id
+handler.main = async (dt,pesan) => {
+    let id = dt.room_id
     let json = server.room[id].siapakahaku[1]
     let clue = json.jawaban.replace(/[AIUEOaiueo]/g, '_')
-    pesan.reply('Clue: ```' + `${clue}` +'``` ')
+    server.room[id].siapakahaku[2] *= game.clue 
+    pesan.reply('Clue: ```' + `${clue}` +'``` '+`\nPoin menjadi ${server.room[id].siapakahaku[2]}`)
 }
 handler.command = /clue/i
-handler.room = 'game'
+handler.tags = ['game']
 handler.child = 'siapakahaku'
 handler.limit = true
 module.exports = handler

@@ -1,10 +1,10 @@
 let fs = require('fs')
-const winScore = 500
+const winScore = 200
 const timeout = 300000
 handler = {}
-handler.main = async function(pesan){
+handler.main = async function(dt,pesan){
     if(typeof pesan.author == 'undefined')return pesan.reply('Game ini hanya tersedia di group')
-    let id = server.room_id
+    let id = dt.room_id
     if(typeof server.room[id].child !== 'undefined'){
         if(server.room[id].child == 'family100'){
             pesan.reply('Masih ada kuis yang belum terjawab di chat ini')
@@ -15,6 +15,8 @@ handler.main = async function(pesan){
     }
     let src = JSON.parse(fs.readFileSync('./app/library/family.json'))
     let json = src[Math.floor(Math.random()*src.length)]
+    index = json.jawaban.findIndex(xx => xx === '')
+    if(index>=0)json.jawaban.splice(index,1)
     let caption = `*Soal:* ${json.soal}\n\nTerdapat *${json.jawaban.length}* jawaban teratas\n${json.jawaban.find(v => v.includes(' '))?'(Beberapa jawaban mengandung spasi)':''}\n\n+${winScore} XP tiap jawaban benar\nTimeout: ${timeout/1000} detik`.trim()
     server.room[id].child = 'family100'
     server.room[id].name = 'game'
@@ -25,13 +27,13 @@ handler.main = async function(pesan){
         terjawab: Array.from(json.jawaban,()=>false),
         winScore,
         tout: setTimeout(()=>{
-            pesan.reply(`Waktu Habis\nTidak menerima jawaban lagi\n->${json.jawaban.join('\n->')}`)
+            pesan.reply(`Waktu Habis\nTidak menerima jawaban lagi\n*${json.soal}*\n->${json.jawaban.join('\n->')}`)
             delete server.room[id].family100
             delete server.room[id].child
         },timeout)
     }
 }
 handler.help = 'family100'
-handler.room = 'game'
-handler.command = /family100?/i
+handler.tags = ['game']
+handler.command = /family100/i
 module.exports = handler

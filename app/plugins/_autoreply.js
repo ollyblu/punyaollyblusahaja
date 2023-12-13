@@ -1,12 +1,13 @@
 let fs = require('fs')
 let moment = require('moment-timezone')
+const util = require('util')
 //let { webp2png } = require('../lib/webp2mp4')
 //const detection = require('../lib/detect')
 //let handler = m => m
 handler = {}
-handler.all = async function (m) {
-    if(server.room[server.room_id].name !== 'home')return false
-    let reg = /(ass?alam|P|halo)/i
+handler.all = async function (dt,m) {
+    if(server.room[dt.room_id].child)return false
+    let reg = /(ass?alam|hai|hi|selamat|halo|tes|okkk)/i
     let isSalam = reg.exec(m.body.split(' ')[0])
     if (isSalam && !m.fromMe) {
         //Sending messages with mentions
@@ -16,8 +17,8 @@ handler.all = async function (m) {
                 _serialized: `${m.author?m.author:m.from}`
             }
         }
-        server.client.sendMessage(m.from,`Halo @${(m.author?m.author:m.from).split('@')[0]} ${ucapan()}`, {mentions: [contact]})
-        console.log(server.room[server.room_id])
+        server.client.sendMessage(m.from,`Halo @${(m.author?m.author:m.from).split('@')[0]} ${ucapan()}`, {mentions: [m.author?m.author:m.from]})
+        //console.log(server.room[dt.room_id])
     }
     //Reply kata kata kotor
     let textfilter = m.body.toLowerCase()
@@ -44,9 +45,30 @@ handler.all = async function (m) {
 \nSumber: https://muslim.or.id/27432-kaum-gay-inilah-wahyu-allah-taala-tentang-anda.html`)
         m.reply(`Tobat dong kk`)
     }
+    
+    if(/sok asik/i.exec(m.body)){
+        m.react('😡')
+        return 0
+    }
+    if(/bot/i.exec(m.body)){
+        m.reply('Hah?')
+        return 0
+    }
+    if(m.mentionedIds && m.mentionedIds.includes(bot.number+'@c.us')){
+        m.reply('Kenapa?')
+        return 0
+    }
+    if(m.hasQuotedMsg){
+        let qouted = await m.getQuotedMessage()
+        // m.reply(util.format(qouted))
+        if(qouted.fromMe){
+            m.reply('Ada apa?')
+            return 0
+        }
+    }
     return !0
 }
-handler.room = 'home'
+//handler.tags = ['game']
 module.exports = handler
 function ucapan() {
     const time = moment.tz('Asia/Jakarta').format('HH')
