@@ -1,13 +1,20 @@
 const cfonts = require('cfonts')
 const chalk = require('chalk')
-const {Client,LocalAuth,MessageMedia} = require('./apiwhatsapp')
+const {Client,LocalAuth,MessageMedia} = require('whatsapp-web.js')
 const generate = require('qrcode-terminal')
 const fs = require('fs')
 const yargs = require('yargs/yargs')
 const _ = require('lodash')
 const path = require('path')
 const syntaxerror = require('syntax-error')
-
+// const { Configuration, OpenAIApi } = require('openai')
+// const configuration = new Configuration({
+//     organization: "org-xlJN19DC3k3485a9pgRgmth3",
+//     apiKey: process.env.OPENAI_API_KEY||'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',
+// });
+// global.server = {}
+// server.openai = new OpenAIApi(configuration);
+// (async()=>server.response = await server.openai.listEngines())()
 var low 
 try{
   low = require('lowdb')
@@ -18,7 +25,9 @@ const {Low,JSONFile} = low
 const {mongoDB, mongoDBV2} = require('./api/mongoDB')
 global.bot = {}
 bot = require('./settings/data.json')
-
+require('./settings/config')
+require('./extension/index')
+global.API = (name, path = '/', query = {}, apikeyqueryname) => (name in global.APIs ? global.APIs[name] : name) + path + (query || apikeyqueryname ? '?' + new URLSearchParams(Object.entries({ ...query, ...(apikeyqueryname ? { [apikeyqueryname]: global.APIKeys[name in global.APIs ? global.APIs[name] : name] } : {}) })) : '')
 global.timestamp ={
   start: new Date()
 }
@@ -83,7 +92,10 @@ server.room = {}
 server.client = new Client({
   authStrategy: new LocalAuth(),
   puppeteer:{
-      headless: true
+      headless: true,
+      product: 'chrome',
+      timeout:30000,
+      args: ['--no-sandbox']
   }
 })
 server.MessageMedia = MessageMedia
@@ -141,6 +153,8 @@ global.reloadHandler = async function (restatConn) {
   server.client.on('auth_failure',(reason)=>handler.auth_failure(reason))
   server.client.on('authenticated',()=>handler.authenticated())
   server.client.on('ready',()=>handler.ready())
+  server.client.on('disconnected',(nav)=>handler.disconnected(nav))
+  server.client.on('change_state',(state)=>handler.changestate(state))
   server.client.on('loading_screen',(percent,message)=>handler.loading_screen(percent,message))
   server.client.on('message_create',(message)=>handler.message_create(message))
   server.client.on('message',(message)=>handler.message_(message))
