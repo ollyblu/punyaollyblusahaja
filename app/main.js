@@ -1,6 +1,6 @@
 const cfonts = require('cfonts')
 const chalk = require('chalk')
-const {Client,LocalAuth,MessageMedia} = require('whatsapp-web.js')
+const {Client,LocalAuth,MessageMedia} = require('./apiwhatsapp')
 const generate = require('qrcode-terminal')
 const fs = require('fs')
 const yargs = require('yargs/yargs')
